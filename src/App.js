@@ -1,24 +1,43 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+
+// Data importing
+import axios from 'axios';
+
+// Leaflet imports
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+//import { Icon } from 'leaflet';
+
+// CSS imports
 import './App.css';
 
 function App() {
+  const [lon, setLon] = useState("-2.280786");
+  const [lat, setLat] = useState("53.475617");
+  const pcode = "M5+3AB";
+  const url = `http://api.getthedata.com/postcode/${pcode}`;
+  
+  useEffect(() => {
+    axios.get(url)
+      .then(response => {
+        setLon(Number(response.data.data.longitude));
+        setLat(Number(response.data.data.latitude));
+      })
+  }, [url]);
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MapContainer center={[lat, lon]} zoom={20}>
+      <TileLayer
+    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  />
+      <Marker position={[lat, lon]}>
+        <Popup>
+          Data type: {typeof lat} <br /> 
+          Post Code: {pcode}<br />
+          Latitude: {lat} <br /> Longitude: {lon}
+        </Popup>
+      </Marker>
+    </MapContainer>
   );
 }
 
